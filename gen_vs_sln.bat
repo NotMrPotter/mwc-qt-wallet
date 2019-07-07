@@ -5,10 +5,11 @@ rem *****************************************
 echo.
 
 rem Clean env
-set CMAKE_BIN=
-set _VSVER=
+set _ARCH=
 set _TARCH=
+set _VSVER=
 set _YEAR=
+set CMAKE_BIN=
 
 rem Try to locate cmake
 where cmake 1>NUL 2>NUL
@@ -41,13 +42,15 @@ if not defined VSCMD_ARG_TGT_ARCH (
 		echo ====
 		echo.
 		pause
+		echo.
 	)
 )
 
 rem Make or clean target directory
 mkdir VS\%_TARCH% 2>NUL
 cd VS\%_TARCH%
-del /f/q/s *.* >NUL
+del /f/q/s CMakeFiles >NUL
+del CMakeCache.txt >NUL
 echo.
 
 
@@ -60,6 +63,7 @@ echo Do not continue until Qt_DIR is set correctly.
 echo ====
 echo.
 pause
+echo.
 
 
 
