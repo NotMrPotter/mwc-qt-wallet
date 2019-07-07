@@ -52,7 +52,7 @@ bool deployFilesFromResources() {
 
 // Read configs
 bool readConfig(QApplication & app) {
-    QCoreApplication::setApplicationName("mwc-gui-wallet");
+    QCoreApplication::setApplicationName("mwc-qt-wallet");
     QCoreApplication::setApplicationVersion("v0.1");
 
     QCommandLineParser parser;
