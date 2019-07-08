@@ -54,6 +54,10 @@ set(CMAKE_AUTORCC ON)
 add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} resources.qrc)
 target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network)
 
+if(WIN32)
+	set(ICON_RC "icon.rc")
+endif()
+
 # Copy Qt runtime libraries to build directory
 # [Copying Qt DLLs to executable directory on Windows using CMake](https://stackoverflow.com/questions/40564443/)
 add_custom_command(

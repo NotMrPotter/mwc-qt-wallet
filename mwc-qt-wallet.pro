@@ -29,11 +29,12 @@ macx {
     CONFIG += app_bundle
     ICON = mw-logo.icns
 
-#mySetOfExtraFiles.files = $$PWD/imagesFolder
-#mySetOfExtraFiles.path = Contents/Resources
-#QMAKE_BUNDLE_DATA += mySetOfExtraFiles
+	#mySetOfExtraFiles.files = $$PWD/imagesFolder
+	#mySetOfExtraFiles.path = Contents/Resources
+	#QMAKE_BUNDLE_DATA += mySetOfExtraFiles
+} win32 {
+	RC_FILE = icon.rc
 }
-
 
 SOURCES += $$files(*.cpp, true)
 SOURCES -= $$files(out/*.cpp, true)
