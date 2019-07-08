@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
+include(ExternalProject)
+include("cmake/RustTriple.cmake")
+
 project(mwc-qt-wallet)
 
 
@@ -78,3 +81,18 @@ add_custom_command(
 
 # Set Visual Studio start-up project
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT mwc-qt-wallet)
+####################
+#
+# mwc713
+#
+
+rust_triple(TARGET_TRIPLE)
+ExternalProject_Add(
+    mwc713
+    DOWNLOAD_COMMAND rustup install 1.35.0-${TARGET_TRIPLE}
+    CONFIGURE_COMMAND rustup run 1.35.0-${TARGET_TRIPLE} cargo clean
+    BUILD_COMMAND  rustup run 1.35.0-${TARGET_TRIPLE} cargo build $<$<NOT:$<CONFIG:Debug>>:--release> --target-dir ${CMAKE_CURRENT_BINARY_DIR}
+    BINARY_DIR "${CMAKE_SOURCE_DIR}/backends/mwc713"
+    INSTALL_COMMAND ""
+    LOG_BUILD ON)
+add_dependencies(mwc-qt-wallet mwc713)

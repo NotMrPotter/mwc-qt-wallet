@@ -37,6 +37,7 @@ macx {
 }
 
 SOURCES += $$files(*.cpp, true)
+SOURCES -= $$files(cmake/*.cpp, true)
 SOURCES -= $$files(out/*.cpp, true)
 SOURCES -= $$files(VS/*.cpp, true)
 
