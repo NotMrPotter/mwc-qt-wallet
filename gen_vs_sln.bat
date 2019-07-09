@@ -6,13 +6,13 @@ echo.
 
 rem Clean env
 set _ARCH=
+set CMAKE_BIN=
 set _QT5_DIR=
 set QT5_DIR=
 set STATIC=
 set _TARCH=
 set _VSVER=
 set _YEAR=
-set CMAKE_BIN=
 
 rem Try to locate cmake
 where cmake 1>NUL 2>NUL
@@ -59,12 +59,11 @@ if not defined VSCMD_ARG_TGT_ARCH (
 	)
 )
 
-rem Make or clean target directory
+rem Create or clean target directory
 mkdir VS\%_TARCH% 2>NUL
 cd VS\%_TARCH%
-del /f/q/s CMakeFiles >NUL
-del CMakeCache.txt >NUL
-echo.
+del /f/q/s CMakeFiles 2>1>NUL
+del CMakeCache.txt 2>1>NUL
 
 
 
