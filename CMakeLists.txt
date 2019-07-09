@@ -167,5 +167,6 @@ ExternalProject_Add(
 	BUILD_COMMAND  rustup run 1.35.0-${TARGET_TRIPLE} cargo build $<$<NOT:$<CONFIG:Debug>>:--release> --target-dir ${CMAKE_CURRENT_BINARY_DIR}
 	BINARY_DIR "${CMAKE_SOURCE_DIR}/backends/mwc713"
 	INSTALL_COMMAND ""
-	LOG_BUILD ON)
+	LOG_BUILD ON
+	USES_TERMINAL_BUILD)
 add_dependencies(mwc-qt-wallet mwc713)
