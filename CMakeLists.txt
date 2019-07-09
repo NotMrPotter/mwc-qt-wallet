@@ -26,8 +26,8 @@ find_package(Qt5 COMPONENTS Core Gui Network Widgets REQUIRED)
 # Compiler options
 #
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard level")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 
 ####################
