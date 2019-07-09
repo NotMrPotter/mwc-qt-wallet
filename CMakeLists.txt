@@ -115,7 +115,8 @@ set(CMAKE_AUTORCC ON)
 #
 
 add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} resources.qrc)
-target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network)
+target_link_libraries(mwc-qt-wallet Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets
+	Qt5::Gui_EGL Qt5::Gui_GLESv2 ${COMMON_LINK_LIBRARIES} ${WIN32_LINK_LIBRARIES})
 
 if(WIN32)
 	set(ICON_RC "icon.rc")
