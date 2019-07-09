@@ -12,12 +12,32 @@ set(Static_Build false CACHE BOOL "Build using static Qt and C++ runtime")
 ####################
 #
 # Qt configuration
-# Please specify here path to your Qt installation
 #
-set (Qt5_DIR "~/Qt/5.9/clang_64/lib/cmake/Qt5")
-#set (Qt5_DIR "/usr/local/opt/qt/lib/cmake/Qt5")
-#set (Qt5_DIR "C:/Qt/5.9.8/msvc2015_64/lib/cmake/Qt5")
 
+if(Qt5_DIR STREQUAL "Qt5_DIR-NOTFOUND")
+	unset(Qt5_DIR CACHE)
+endif()
+
+if(APPLE)
+	set(Qt5_DIR "~/Qt/5.9/clang_64/lib/cmake/Qt5" CACHE PATH "The directory containing Qt5Config.cmake (i.e. .../lib/cmake/Qt5")
+elseif(LINUX)
+	set(Qt5_DIR "/usr/local/opt/qt/lib/cmake/Qt5" CACHE PATH "The directory containing Qt5Config.cmake (i.e. .../lib/cmake/Qt5")
+elseif(WIN32)
+	set(32bit false CACHE BOOL "Build for 32-bit Windows")
+	if(Static_Build)
+		if(32bit)
+			set(Qt5_DIR "C:/Qt/5.9.8/win32-msvc-static/lib/cmake/Qt5" CACHE PATH "The directory containing Qt5Config.cmake (i.e. .../lib/cmake/Qt5")
+		else()
+			set(Qt5_DIR "C:/Qt/5.9.8/win32-msvc_64-static/lib/cmake/Qt5" CACHE PATH "The directory containing Qt5Config.cmake (i.e. .../lib/cmake/Qt5")
+		endif()
+	else()
+		if(32bit)
+			set(Qt5_DIR "C:/Qt/5.9.8/msvc2015/lib/cmake/Qt5" CACHE PATH "The directory containing Qt5Config.cmake (i.e. .../lib/cmake/Qt5")
+		else()
+			set(Qt5_DIR "C:/Qt/5.9.8/msvc2015_64/lib/cmake/Qt5" CACHE PATH "The directory containing Qt5Config.cmake (i.e. .../lib/cmake/Qt5")
+		endif()
+	endif()
+endif()
 find_package(Qt5 COMPONENTS Core Gui Network Widgets REQUIRED)
 
 

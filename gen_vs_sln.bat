@@ -6,6 +6,8 @@ echo.
 
 rem Clean env
 set _ARCH=
+set _QT5_DIR=
+set QT5_DIR=
 set STATIC=
 set _TARCH=
 set _VSVER=
@@ -30,8 +32,15 @@ if not defined _VSVER goto :vserr
 rem Try to pick an appropriate target arch
 if "%1"=="/32" set _TARCH=x86
 if "%2"=="/32" set _TARCH=x86
+if "%3"=="/32" set _TARCH=x86
+if "%4"=="/32" set _TARCH=x86
 if "%1"=="/static" set STATIC=-DStatic_Build:BOOL=true
 if "%2"=="/static" set STATIC=-DStatic_Build:BOOL=true
+if "%3"=="/static" set STATIC=-DStatic_Build:BOOL=true
+if "%4"=="/static" set STATIC=-DStatic_Build:BOOL=true
+if "%1"=="/qt5" set QT5_DIR=-DQt5_DIR:PATH="%2"
+if "%2"=="/qt5" set QT5_DIR=-DQt5_DIR:PATH="%3"
+if "%3"=="/qt5" set QT5_DIR=-DQt5_DIR:PATH="%4"
 if not defined _TARCH set _TARCH=%VSCMD_ARG_TGT_ARCH%
 if not defined _TARCH set _TARCH=x64
 
@@ -59,15 +68,21 @@ echo.
 
 
 
-rem CMakeLists.txt must point to Qt
-echo.
-echo ====
-echo STOP: Did you remember to edit CMakeLists.txt to point to your Qt installation?
-echo Do not continue until Qt_DIR is set correctly.
-echo ====
-echo.
-pause
-echo.
+rem Check provided Qt5_DIR before proceeding
+if not defined QT5_DIR (
+	echo.
+	echo ====
+	echo STOP: Using default Qt 5.9.8 install directory. If Qt is installed somewhere
+	echo else, specify it like /qt=C:\path\to\qt\5.9.8\msvc2015\lib\cmake\qt5
+	echo ====
+	echo.
+	pause
+	echo.
+) else (
+	echo.
+	echo Using Qt at %QT5_DIR%
+	echo.
+)
 
 
 
@@ -79,21 +94,21 @@ if "%_VSVER%"=="16.0" goto :vs16
 :vs14
 set _YEAR=2015
 if "%_TARCH%"=="x64" set _ARCH= Win64
-"%CMAKE_BIN%" -G"Visual Studio 14 2015%_ARCH%" %STATIC% ..\..
+"%CMAKE_BIN%" -G"Visual Studio 14 2015%_ARCH%" %STATIC% %QT5_DIR% ..\..
 if %ERRORLEVEL% neq 0 goto :generr
 goto :success
 
 :vs15
 set _YEAR=2017
 if "%_TARCH%"=="x64" set _ARCH= Win64
-"%CMAKE_BIN%" -G"Visual Studio 15 2017%_ARCH%" %STATIC% ..\..
+"%CMAKE_BIN%" -G"Visual Studio 15 2017%_ARCH%" %STATIC% %QT5_DIR% ..\..
 if %ERRORLEVEL% neq 0 goto :generr
 goto :success
 
 :vs16
 set _YEAR=2019
 if "%_TARCH%"=="x64" set _ARCH= x64
-"%CMAKE_BIN%" -G"Visual Studio 16 2019" -A%_ARCH% %STATIC% ..\..
+"%CMAKE_BIN%" -G"Visual Studio 16 2019" -A%_ARCH% %STATIC% %QT5_DIR% ..\..
 if %ERRORLEVEL% neq 0 goto :generr
 goto :success
 
