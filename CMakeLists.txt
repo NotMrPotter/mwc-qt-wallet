@@ -121,8 +121,18 @@ endif()
 # Project settings
 #
 
-# Set Visual Studio start-up project
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT mwc-qt-wallet)
+if(MSVC)
+	# Set Visual Studio start-up project
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT mwc-qt-wallet)
+
+	set(Debug_Console false CACHE BOOL "Build as a console application")
+	if(NOT Debug_Console)
+		# Build without a console
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+	endif()
+endif()
+
+
 ####################
 #
 # mwc713
