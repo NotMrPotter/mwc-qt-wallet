@@ -6,6 +6,7 @@ echo.
 
 rem Clean env
 set _ARCH=
+set STATIC=
 set _TARCH=
 set _VSVER=
 set _YEAR=
@@ -28,6 +29,9 @@ if not defined _VSVER goto :vserr
 
 rem Try to pick an appropriate target arch
 if "%1"=="/32" set _TARCH=x86
+if "%2"=="/32" set _TARCH=x86
+if "%1"=="/static" set STATIC=-DStatic_Build:BOOL=true
+if "%2"=="/static" set STATIC=-DStatic_Build:BOOL=true
 if not defined _TARCH set _TARCH=%VSCMD_ARG_TGT_ARCH%
 if not defined _TARCH set _TARCH=x64
 
@@ -75,21 +79,21 @@ if "%_VSVER%"=="16.0" goto :vs16
 :vs14
 set _YEAR=2015
 if "%_TARCH%"=="x64" set _ARCH= Win64
-"%CMAKE_BIN%" -G"Visual Studio 14 2015%_ARCH%" ..\..
+"%CMAKE_BIN%" -G"Visual Studio 14 2015%_ARCH%" %STATIC% ..\..
 if %ERRORLEVEL% neq 0 goto :generr
 goto :success
 
 :vs15
 set _YEAR=2017
 if "%_TARCH%"=="x64" set _ARCH= Win64
-"%CMAKE_BIN%" -G"Visual Studio 15 2017%_ARCH%" ..\..
+"%CMAKE_BIN%" -G"Visual Studio 15 2017%_ARCH%" %STATIC% ..\..
 if %ERRORLEVEL% neq 0 goto :generr
 goto :success
 
 :vs16
 set _YEAR=2019
 if "%_TARCH%"=="x64" set _ARCH= x64
-"%CMAKE_BIN%" -G"Visual Studio 16 2019" -A%_ARCH% ..\..
+"%CMAKE_BIN%" -G"Visual Studio 16 2019" -A%_ARCH% %STATIC% ..\..
 if %ERRORLEVEL% neq 0 goto :generr
 goto :success
 

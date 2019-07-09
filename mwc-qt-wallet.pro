@@ -40,6 +40,7 @@ SOURCES += $$files(*.cpp, true)
 SOURCES -= $$files(cmake/*.cpp, true)
 SOURCES -= $$files(out/*.cpp, true)
 SOURCES -= $$files(VS/*.cpp, true)
+SOURCES -= $$files(plugins.cpp, true)
 
 HEADERS += $$files(*.h, true)
 HEADERS -= $$files(out/*.h, true)

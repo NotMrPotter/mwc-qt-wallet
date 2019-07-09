@@ -6,6 +6,8 @@ include("cmake/RustTriple.cmake")
 
 project(mwc-qt-wallet)
 
+set(Static_Build false CACHE BOOL "Build using static Qt and C++ runtime")
+
 
 ####################
 #
@@ -16,7 +18,7 @@ set (Qt5_DIR "~/Qt/5.9/clang_64/lib/cmake/Qt5")
 #set (Qt5_DIR "/usr/local/opt/qt/lib/cmake/Qt5")
 #set (Qt5_DIR "C:/Qt/5.9.8/msvc2015_64/lib/cmake/Qt5")
 
-find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Network Widgets REQUIRED)
 
 
 ####################
@@ -26,6 +28,44 @@ find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+
+
+####################
+#
+# Static build conf
+#
+
+if(Static_Build)
+	message(${Qt5_DIR})
+	if(MSVC)
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+	endif()
+
+	function(import_qt_libs)
+		foreach(lib_base_name ${ARGN})
+			add_library(${lib_base_name} STATIC IMPORTED)
+			set_target_properties(${lib_base_name} PROPERTIES IMPORTED_LOCATION_DEBUG "${Qt5_DIR}/../../${lib_base_name}d${CMAKE_STATIC_LIBRARY_SUFFIX}")
+			set_target_properties(${lib_base_name} PROPERTIES IMPORTED_LOCATION_RELEASE "${Qt5_DIR}/../../${lib_base_name}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+		endforeach()
+	endfunction()
+
+	import_qt_libs("preprocessor" "Qt5AccessibilitySupport" "Qt5EventDispatcherSupport" "Qt5FontDatabaseSupport" "Qt5ThemeSupport" "qtfreetype" "qtharfbuzz" "qtlibpng" "qtmain" "qtpcre2" "translator")
+
+	set(COMMON_LINK_LIBRARIES preprocessor Qt5AccessibilitySupport Qt5EventDispatcherSupport Qt5FontDatabaseSupport Qt5ThemeSupport
+		qtfreetype qtharfbuzz qtlibpng qtpcre2 qtmain translator)
+
+	# TODO: other platforms
+	if(WIN32)
+		add_library(qwindows STATIC IMPORTED)
+		set_target_properties(qwindows PROPERTIES IMPORTED_LOCATION_DEBUG "${Qt5_DIR}/../../../plugins/platforms/qwindowsd${CMAKE_STATIC_LIBRARY_SUFFIX}")
+		set_target_properties(qwindows PROPERTIES IMPORTED_LOCATION_RELEASE "${Qt5_DIR}/../../../plugins/platforms/qwindows${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+		set(WIN32_LINK_LIBRARIES d3d9 dnsapi dwmapi dxguid imm32 iphlpapi mpr qwindows rpcrt4 shlwapi uxtheme version winmm ws2_32)
+	endif()
+endif()
 
 
 ####################
@@ -61,17 +101,19 @@ if(WIN32)
 	set(ICON_RC "icon.rc")
 endif()
 
-# Copy Qt runtime libraries to build directory
-# [Copying Qt DLLs to executable directory on Windows using CMake](https://stackoverflow.com/questions/40564443/)
-add_custom_command(
-    TARGET mwc-qt-wallet POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_FILE:Qt5::Core>
-        $<TARGET_FILE:Qt5::Gui>
-        $<TARGET_FILE:Qt5::Widgets>
-        $<TARGET_FILE:Qt5::Network>
-        $<TARGET_FILE_DIR:mwc-qt-wallet>
-)
+if(NOT Static_Build)
+	# Copy Qt runtime libraries to build directory
+	# [Copying Qt DLLs to executable directory on Windows using CMake](https://stackoverflow.com/questions/40564443/)
+	add_custom_command(
+		TARGET mwc-qt-wallet POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			$<TARGET_FILE:Qt5::Core>
+			$<TARGET_FILE:Qt5::Gui>
+			$<TARGET_FILE:Qt5::Network>
+			$<TARGET_FILE:Qt5::Widgets>
+			$<TARGET_FILE_DIR:mwc-qt-wallet>
+	)
+endif()
 
 
 ####################
@@ -88,11 +130,11 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT m
 
 rust_triple(TARGET_TRIPLE)
 ExternalProject_Add(
-    mwc713
-    DOWNLOAD_COMMAND rustup install 1.35.0-${TARGET_TRIPLE}
-    CONFIGURE_COMMAND rustup run 1.35.0-${TARGET_TRIPLE} cargo clean
-    BUILD_COMMAND  rustup run 1.35.0-${TARGET_TRIPLE} cargo build $<$<NOT:$<CONFIG:Debug>>:--release> --target-dir ${CMAKE_CURRENT_BINARY_DIR}
-    BINARY_DIR "${CMAKE_SOURCE_DIR}/backends/mwc713"
-    INSTALL_COMMAND ""
-    LOG_BUILD ON)
+	mwc713
+	DOWNLOAD_COMMAND rustup install 1.35.0-${TARGET_TRIPLE}
+	CONFIGURE_COMMAND rustup run 1.35.0-${TARGET_TRIPLE} cargo clean
+	BUILD_COMMAND  rustup run 1.35.0-${TARGET_TRIPLE} cargo build $<$<NOT:$<CONFIG:Debug>>:--release> --target-dir ${CMAKE_CURRENT_BINARY_DIR}
+	BINARY_DIR "${CMAKE_SOURCE_DIR}/backends/mwc713"
+	INSTALL_COMMAND ""
+	LOG_BUILD ON)
 add_dependencies(mwc-qt-wallet mwc713)
